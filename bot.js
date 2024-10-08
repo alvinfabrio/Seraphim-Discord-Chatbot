@@ -1,5 +1,3 @@
-
-
 const { Client, GatewayIntentBits } = require('discord.js');
 const { OpenAI } = require("openai");
 const fs = require('fs');
