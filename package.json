@@ -2,7 +2,7 @@
   "name": "seraphim-app",
   "version": "1.0.0",
   "description": "Seraphim Onboarding Chatbot",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,9 +19,12 @@
   "dependencies": {
     "child_process": "^1.0.2",
     "discord.js": "^14.16.3",
+    "docx": "^8.5.0",
     "dotenv": "^16.4.5",
     "fs": "^0.0.1-security",
+    "googleapis": "^144.0.0",
     "nodemon": "^3.1.7",
+    "open": "^10.1.0",
     "openai": "^4.66.1"
   }
 }
