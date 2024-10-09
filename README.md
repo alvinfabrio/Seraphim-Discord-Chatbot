@@ -30,7 +30,7 @@ https://www.youtube.com/watch?v=1y0-IfRW114&t=759s
    ```
 2. **Navigate to the Repository Folder**:
    ```
-   cd Seraphim-Discord-Cahatbot
+   cd Seraphim-Discord-Chatbot
    ```
 3. **Install Dependencies**:
    ```
