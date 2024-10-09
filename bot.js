@@ -1,4 +1,4 @@
-// Initialization
+
 const { Client, GatewayIntentBits } = require('discord.js');
 const { OpenAI } = require("openai");
 const fs = require('fs');
@@ -151,12 +151,13 @@ client.on('messageCreate', async message => {
             {
                 assistant_id: process.env.ASSISTANT_ID,
                 max_completion_tokens: 4000,
-                tools: [
-                    {
-                        type: 'file_search',
-                        vector_store_ids: [process.env.VECTOR_STORE_ID] // Specify vector store ID for file search
-                    }
-                ]
+                tools: [{ type: 'file_search' }],
+                tool_resources: {
+                  file_search: {
+                    vector_store_ids: [process.env.VECTOR_STORE_ID]
+                  }
+                },
+                tool_choice: { type: 'file_search' }
             }
         );
 
