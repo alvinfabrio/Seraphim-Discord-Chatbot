@@ -1,6 +1,6 @@
 # Seraphim
 
-In this repo we integrate Discord.js with the new OpenAI Assistants API. The bot operates within Discord channels, listening to messages and using OpenAI to generate responses.
+In this repo we integrate Discord.js with the new OpenAI Assistants API as well as Google Drive API. The bot operates within Discord channels, listening to messages, using OpenAI to generate responses and using Google Drive API to host document generation.
 
 ## Video Guide
 OpenAI Assistant Initialization:
