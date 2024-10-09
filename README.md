@@ -69,8 +69,8 @@ https://www.youtube.com/watch?v=1y0-IfRW114&t=759s
 
 - **Interaction**: Simply type and send messages in your Discord server where the bot is added. The bot will automatically generate and send replies based on the OpenAI model's output.
 - **Discord Channels**: Works in any text channel or thread where the bot has permissions to read and send messages.
-- **Document Generation: Simply add in the keyword "create" in your message followd by the document and its specification (E.g. recipient name, date, role, etc)
-- **E.g. "Please create a volunter letter for John Doe where he will be joining the IT department starting from the 7th of October"
+- **Document Generation**: Simply add in the keyword "create" in your message followd by the document and its specification (E.g. recipient name, date, role, etc)
+- **E.g.** "Please create a volunter letter for John Doe where he will be joining the IT department starting from the 7th of October"
 
 ## Contributing
 
