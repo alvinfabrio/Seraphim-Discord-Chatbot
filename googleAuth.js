@@ -83,9 +83,11 @@ const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
 const TOKEN_PATH = 'token.json';
 let oauth2Client;
 
-// Load your credentials from environment variables
 async function authenticateGoogle() {
-    await loadOpenModule(); // Ensure 'open' is available before using it
+    // Load the 'open' module early so it's ready when we need it
+    if (!open) {
+        await loadOpenModule();
+    }
 
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -137,3 +139,5 @@ async function uploadFileToDrive(fileName, filePath) {
     const link = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
     return link;
 }
+
+module.exports = { authenticateGoogle, uploadFileToDrive };
