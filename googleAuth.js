@@ -148,40 +148,22 @@
 
 const { google } = require('googleapis');
 const fs = require('fs');
+const { JWT } = require('google-auth-library');
 
-// Google Drive API client
-let drive;
+// This assumes you have the Base64-encoded service account JSON in an environment variable
+const serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf-8'));
 
-// Authenticate using domain-wide delegation with a service account
-async function authenticateGoogle() {
-    if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
-        throw new Error('Environment variable GOOGLE_SERVICE_ACCOUNT_KEY is not set.');
-    }
+// Create the JWT client using the service account credentials
+const auth = new JWT({
+    email: serviceAccountKey.client_email,
+    key: serviceAccountKey.private_key,
+    scopes: ['https://www.googleapis.com/auth/drive'],  // Required scope for Drive access
+});
 
-    // Decode the Base64-encoded service account key from the environment variable
-    const serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf-8'));
+// Create the Google Drive client with the authenticated JWT
+const drive = google.drive({ version: 'v3', auth });
 
-    // Initialize the Google Auth client with impersonation
-    const auth = new google.auth.GoogleAuth({
-        credentials: serviceAccountKey,
-        scopes: ['https://www.googleapis.com/auth/drive'],
-        clientOptions: {
-            subject: 'alvinfabrio@fica.org', // Email of the user to impersonate
-        },
-    });
-
-    // Create the Google Drive client
-    drive = google.drive({ version: 'v3', auth });
-
-    console.log('Authenticated using service account with domain-wide delegation.');
-}
-
-// Upload a file to Google Drive
 async function uploadFileToDrive(fileName, filePath) {
-    if (!drive) {
-        throw new Error('Google Drive API not authenticated. Call authenticateGoogle() first.');
-    }
-
     const fileMetadata = {
         name: fileName,
     };
@@ -191,6 +173,7 @@ async function uploadFileToDrive(fileName, filePath) {
         body: fs.createReadStream(filePath),
     };
 
+    // Upload the file to Google Drive
     const response = await drive.files.create({
         resource: fileMetadata,
         media: media,
@@ -203,4 +186,5 @@ async function uploadFileToDrive(fileName, filePath) {
     return link;
 }
 
-module.exports = { authenticateGoogle, uploadFileToDrive };
+// Example: Upload a file
+uploadFileToDrive('test-file.docx', './path/to/file.docx');
