@@ -158,7 +158,8 @@ async function authenticateGoogle() {
         throw new Error('Environment variable GOOGLE_SERVICE_ACCOUNT_KEY is not set.');
     }
 
-    const serviceAccountKey = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+    // Decode the Base64-encoded service account key from the environment variable
+    const serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf-8'));
 
     // Initialize the Google Auth client with impersonation
     const auth = new google.auth.GoogleAuth({
