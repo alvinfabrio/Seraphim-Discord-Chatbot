@@ -73,61 +73,44 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 
+
 // const { google } = require('googleapis');
 // const fs = require('fs');
-// const path = require('path');
 
-// let open;
+// // Google Drive API client
+// let drive;
 
-// async function loadOpenModule() {
-//     open = (await import('open')).default;
-// }
-
-// const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
-// const TOKEN_PATH = 'token.json';
-// let oauth2Client;
-
+// // Authenticate using the service account (no impersonation needed)
 // async function authenticateGoogle() {
-//     // Load the 'open' module early so it's ready when we need it
-//     if (!open) {
-//         await loadOpenModule();
+//     if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+//         throw new Error('Environment variable GOOGLE_SERVICE_ACCOUNT_KEY is not set.');
 //     }
 
-//     const clientId = process.env.GOOGLE_CLIENT_ID;
-//     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-//     const redirectUri = process.env.GOOGLE_REDIRECT_URI;
-//     const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+//     // Decode the Base64-encoded service account key from the environment variable
+//     const serviceAccountKey = JSON.parse(Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY, 'base64').toString('utf-8'));
 
-//     oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+//     // Initialize the Google Auth client
+//     const auth = new google.auth.GoogleAuth({
+//         credentials: serviceAccountKey,
+//         scopes: ['https://www.googleapis.com/auth/drive'],  // Required scope for Drive access
+//     });
 
-//     // Use the refresh token if it's available in the environment variables
-//     if (refreshToken) {
-//         oauth2Client.setCredentials({ refresh_token: refreshToken });
-//         console.log('Using refresh token from environment variables.');
-//     } else if (fs.existsSync(TOKEN_PATH)) {
-//         // Otherwise, check if a token is stored locally
-//         const token = fs.readFileSync(TOKEN_PATH, 'utf8');
-//         oauth2Client.setCredentials(JSON.parse(token));
-//         console.log('Using stored token.');
-//     } else {
-//         // If no tokens exist, prompt user for authorization
-//         const authUrl = oauth2Client.generateAuthUrl({
-//             access_type: 'offline',
-//             scope: SCOPES,
-//         });
-//         console.log('Authorize this app by visiting this url:', authUrl);
+//     // Create the Google Drive client with the authenticated credentials
+//     drive = google.drive({ version: 'v3', auth });
 
-//         // Automatically open the URL in the default browser
-//         await open(authUrl);
-//     }
+//     console.log('Authenticated using service account.');
 // }
 
-// // Upload file to Google Drive
+// // Upload a file to Google Drive
 // async function uploadFileToDrive(fileName, filePath) {
-//     const drive = google.drive({ version: 'v3', auth: oauth2Client });
+//     if (!drive) {
+//         throw new Error('Google Drive API not authenticated. Call authenticateGoogle() first.');
+//     }
+
 //     const fileMetadata = {
 //         name: fileName,
 //     };
+
 //     const media = {
 //         mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 //         body: fs.createReadStream(filePath),
@@ -141,6 +124,7 @@
 
 //     const fileId = response.data.id;
 //     const link = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
+//     console.log(`File uploaded successfully. Link: ${link}`);
 //     return link;
 // }
 
@@ -164,7 +148,7 @@ async function authenticateGoogle() {
     // Initialize the Google Auth client
     const auth = new google.auth.GoogleAuth({
         credentials: serviceAccountKey,
-        scopes: ['https://www.googleapis.com/auth/drive'],  // Required scope for Drive access
+        scopes: ['https://www.googleapis.com/auth/drive'], // Required scope for Drive access
     });
 
     // Create the Google Drive client with the authenticated credentials
@@ -188,6 +172,7 @@ async function uploadFileToDrive(fileName, filePath) {
         body: fs.createReadStream(filePath),
     };
 
+    // Upload the file
     const response = await drive.files.create({
         resource: fileMetadata,
         media: media,
@@ -195,8 +180,19 @@ async function uploadFileToDrive(fileName, filePath) {
     });
 
     const fileId = response.data.id;
+
+    // Set sharing permissions (make the file accessible to anyone with the link)
+    await drive.permissions.create({
+        fileId: fileId,
+        requestBody: {
+            role: 'writer', // Use 'writer' if you want to allow editing
+            type: 'anyone', // Share with anyone who has the link
+        },
+    });
+
+    // Generate the shareable link
     const link = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
-    console.log(`File uploaded successfully. Link: ${link}`);
+    console.log(`File uploaded and shared successfully. Link: ${link}`);
     return link;
 }
 
